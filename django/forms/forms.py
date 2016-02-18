@@ -175,7 +175,7 @@ class BaseForm(object):
         """
         return 'initial-%s' % self.add_prefix(field_name)
 
-    def _html_output(self, normal_row, error_row, row_ender, help_text_html, errors_on_separate_row):
+    def _html_output(self, normal_row, error_row, row_ender, help_text_html, errors_on_separate_row, extra_classes=None):
         "Helper function for outputting HTML. Used by as_table(), as_ul(), as_p()."
         top_errors = self.non_field_errors()  # Errors that should be displayed above all fields.
         output, hidden_fields = [], []
@@ -194,7 +194,7 @@ class BaseForm(object):
             else:
                 # Create a 'class="..."' attribute if the row should have any
                 # CSS classes applied.
-                css_classes = bf.css_classes()
+                css_classes = bf.css_classes(extra_classes=extra_classes)
                 if css_classes:
                     html_class_attr = ' class="%s"' % css_classes
 
@@ -253,32 +253,35 @@ class BaseForm(object):
                 output.append(str_hidden)
         return mark_safe('\n'.join(output))
 
-    def as_table(self):
+    def as_table(self, extra_classes=None):
         "Returns this form rendered as HTML <tr>s -- excluding the <table></table>."
         return self._html_output(
             normal_row='<tr%(html_class_attr)s><th>%(label)s</th><td>%(errors)s%(field)s%(help_text)s</td></tr>',
             error_row='<tr><td colspan="2">%s</td></tr>',
             row_ender='</td></tr>',
             help_text_html='<br /><span class="helptext">%s</span>',
-            errors_on_separate_row=False)
+            errors_on_separate_row=False,
+            extra_classes=extra_classes)
 
-    def as_ul(self):
+    def as_ul(self, extra_classes=None):
         "Returns this form rendered as HTML <li>s -- excluding the <ul></ul>."
         return self._html_output(
             normal_row='<li%(html_class_attr)s>%(errors)s%(label)s %(field)s%(help_text)s</li>',
             error_row='<li>%s</li>',
             row_ender='</li>',
             help_text_html=' <span class="helptext">%s</span>',
-            errors_on_separate_row=False)
+            errors_on_separate_row=False,
+            extra_classes=extra_classes)
 
-    def as_p(self):
+    def as_p(self, extra_classes=None):
         "Returns this form rendered as HTML <p>s."
         return self._html_output(
             normal_row='<p%(html_class_attr)s>%(label)s %(field)s%(help_text)s</p>',
             error_row='%s',
             row_ender='</p>',
             help_text_html=' <span class="helptext">%s</span>',
-            errors_on_separate_row=True)
+            errors_on_separate_row=True,
+            extra_classes=extra_classes)
 
     def non_field_errors(self):
         """
